@@ -1,0 +1,32 @@
+https://jupyterhub-tutorial.readthedocs.io/en/latest/timeline.html
+https://www.youtube.com/watch?v=LkgSCjyv75s
+https://github.com/minrk/jupyterhub-pydata-2016/blob/master/JupyterHub.pdf
+https://github.com/jupyterhub/jupyterhub-deploy-docker
+https://nbgrader.readthedocs.io/en/stable/
+https://github.com/jupyterhub/jupyterhub-deploy-teaching
+https://jupyterhub-tutorial.readthedocs.io/en/latest/index.html
+https://github.com/jupyterhub/ldapauthenticator
+https://github.com/jupyterhub/dockerspawner
+
+
+sudo docker build -t mytest-postgres-db examples/mytest/db
+sudo docker build -t hub examples/mytest
+sudo docker pull jupyter/base-notebook
+sudo docker network create mytest
+sudo docker run -d --name=my-db --net mytest mytest-postgres-db
+sudo docker container inspect my-db | grep "IPAddress"
+sudo docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock --name jupyterhub -p8888:8000 --net mytest --link my-db:postgres -e POSTGRES_PORT_5432_TCP_ADDR=172.18.0.2 hub
+
+
+sudo docker exec -it my-db psql -U postgres
+
+\c jupyterhub
+CREATE EXTENSION "uuid-ossp";
+INSERT INTO users(name, admin, created, last_activity, cookie_id, state) VALUES('xj', 't', NOW(), NOW(), REPLACE(UUID_GENERATE_V4()::TEXT, '-', ''), '{}');
+INSERT INTO users(name, admin, created, last_activity, cookie_id, state) VALUES('cw', 'f', NOW(), NOW(), REPLACE(UUID_GENERATE_V4()::TEXT, '-', ''), '{}');
+INSERT INTO users(name, admin, created, last_activity, cookie_id, state) VALUES('zy', 'f', NOW(), NOW(), REPLACE(UUID_GENERATE_V4()::TEXT, '-', ''), '{}');
+INSERT INTO users(name, admin, created, last_activity, cookie_id, state) VALUES('tom', 'f', NOW(), NOW(), REPLACE(UUID_GENERATE_V4()::TEXT, '-', ''), '{}');
+SELECT id, name, admin, created, last_activity, cookie_id, state, encrypted_auth_state FROM users;
+\q
+
+
